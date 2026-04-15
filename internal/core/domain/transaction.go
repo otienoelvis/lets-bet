@@ -90,7 +90,7 @@ func (w *Wallet) CanDeposit(amount decimal.Decimal, limit *int64) bool {
 	}
 	
 	// Reset if new day
-	if time.Now().Sub(w.LastDepositReset).Hours() >= 24 {
+	if time.Since(w.LastDepositReset).Hours() >= 24 {
 		return true
 	}
 	
