@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/betting-platform/internal/gateway"
 	"github.com/gorilla/mux"
 )
 
@@ -24,13 +23,10 @@ func main() {
 	r := mux.NewRouter()
 
 	// Initialize handlers
-	handler := gateway.NewHandler()
+	handler := gateway.NewGatewayHandler(nil, nil)
 
 	// Register routes
 	handler.RegisterRoutes(r)
-
-	// CORS middleware
-	r.Use(handler.CorsMiddleware)
 
 	// Start server
 	port := os.Getenv("PORT")

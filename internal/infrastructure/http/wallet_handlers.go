@@ -1,4 +1,4 @@
-package wallet
+package http
 
 import (
 	"net/http"
@@ -6,15 +6,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Handler struct {
-	// Add dependencies here (wallet service, repositories, etc.)
+// WalletHandler handles wallet service HTTP requests
+type WalletHandler struct{}
+
+func NewWalletHandler() *WalletHandler {
+	return &WalletHandler{}
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
-}
-
-func (h *Handler) RegisterRoutes(r *mux.Router) {
+func (h *WalletHandler) RegisterRoutes(r *mux.Router) {
 	// Health check
 	r.HandleFunc("/health", h.healthCheckHandler).Methods("GET")
 
@@ -27,13 +26,13 @@ func (h *Handler) RegisterRoutes(r *mux.Router) {
 	api.HandleFunc("/wallets/{userId}/transactions", h.getTransactionsHandler).Methods("GET")
 }
 
-func (h *Handler) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"healthy","service":"wallet"}`))
 }
 
-func (h *Handler) getWalletHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) getWalletHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["userId"]
 	
@@ -42,7 +41,7 @@ func (h *Handler) getWalletHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"user_id":"` + userID + `","balance":1000.00,"currency":"KES","bonus_balance":50.00}`))
 }
 
-func (h *Handler) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["userId"]
 	
@@ -51,7 +50,7 @@ func (h *Handler) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"user_id":"` + userID + `","balance":1000.00,"available":950.00}`))
 }
 
-func (h *Handler) debitHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) debitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["userId"]
 	
@@ -60,7 +59,7 @@ func (h *Handler) debitHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"user_id":"` + userID + `","status":"debited","amount":100.00}`))
 }
 
-func (h *Handler) creditHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) creditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["userId"]
 	
@@ -69,7 +68,7 @@ func (h *Handler) creditHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"user_id":"` + userID + `","status":"credited","amount":100.00}`))
 }
 
-func (h *Handler) getTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *WalletHandler) getTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["userId"]
 	
