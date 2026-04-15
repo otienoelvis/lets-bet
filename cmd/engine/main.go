@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/betting-platform/internal/engine"
+	enginehttp "github.com/betting-platform/internal/infrastructure/http"
 	"github.com/gorilla/mux"
 )
 
@@ -20,7 +20,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// Initialize handlers
-	handler := engine.NewHandler()
+	handler := enginehttp.NewEngineHandler(nil)
 
 	// Register routes
 	handler.RegisterRoutes(r)
