@@ -2,35 +2,43 @@ package games
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/betting-platform/internal/core/domain"
 	"github.com/betting-platform/internal/core/usecase"
+	"github.com/betting-platform/internal/core/usecase/tax"
+	"github.com/betting-platform/internal/core/usecase/wallet"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
 // CrashGameEngine manages the game loop for Aviator-style crash games
 type CrashGameEngine struct {
-	hub          WebSocketHub
-	fairService  *usecase.ProvablyFairService
-	gameRepo     GameRepository
-	betRepo      GameBetRepository
-	currentGame  *domain.Game
-	roundNumber  int64
-	tickInterval time.Duration
+	hub           WebSocketHub
+	fairService   *usecase.ProvablyFairService
+	gameRepo      GameRepository
+	betRepo       GameBetRepository
+	walletService *wallet.Service
+	taxEngine     *tax.Engine
+	currentGame   *domain.Game
+	roundNumber   int64
+	tickInterval  time.Duration
 }
 
 type GameRepository interface {
 	Create(ctx context.Context, game *domain.Game) error
+	GetByID(ctx context.Context, id uuid.UUID) (*domain.Game, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.GameStatus) error
 }
 
 type GameBetRepository interface {
 	Create(ctx context.Context, bet *domain.GameBet) error
+	GetByID(ctx context.Context, id uuid.UUID) (*domain.GameBet, error)
 	GetActiveByGame(ctx context.Context, gameID uuid.UUID) ([]*domain.GameBet, error)
 	UpdateCashout(ctx context.Context, id uuid.UUID, cashoutAt decimal.Decimal, payout decimal.Decimal) error
+	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.GameBetStatus) error
 }
 
 type WebSocketHub interface {
@@ -43,14 +51,18 @@ func NewCrashGameEngine(
 	fairService *usecase.ProvablyFairService,
 	gameRepo GameRepository,
 	betRepo GameBetRepository,
+	walletService *wallet.Service,
+	taxEngine *tax.Engine,
 ) *CrashGameEngine {
 	return &CrashGameEngine{
-		hub:          hub,
-		fairService:  fairService,
-		gameRepo:     gameRepo,
-		betRepo:      betRepo,
-		roundNumber:  1,
-		tickInterval: 100 * time.Millisecond, // Update every 100ms
+		hub:           hub,
+		fairService:   fairService,
+		gameRepo:      gameRepo,
+		betRepo:       betRepo,
+		walletService: walletService,
+		taxEngine:     taxEngine,
+		roundNumber:   1,
+		tickInterval:  100 * time.Millisecond, // Update every 100ms
 	}
 }
 
@@ -72,6 +84,9 @@ func (e *CrashGameEngine) Start(ctx context.Context) {
 func (e *CrashGameEngine) runRound(ctx context.Context) {
 	// 1. Prepare new round
 	game := e.prepareNewRound(ctx)
+	if game == nil {
+		return
+	}
 
 	// 2. Betting phase
 	e.bettingPhase(ctx, game)
@@ -88,7 +103,11 @@ func (e *CrashGameEngine) runRound(ctx context.Context) {
 
 func (e *CrashGameEngine) prepareNewRound(ctx context.Context) *domain.Game {
 	// Generate provably fair crash point
-	serverSeed := e.fairService.GenerateServerSeed()
+	serverSeed, err := e.fairService.GenerateServerSeed()
+	if err != nil {
+		log.Printf("error generating server seed: %v", err)
+		return nil
+	}
 	clientSeed := "default-client-seed" // In production, get from user
 	crashPoint := e.fairService.CalculateCrashPoint(serverSeed, clientSeed, e.roundNumber)
 
@@ -222,35 +241,87 @@ func (e *CrashGameEngine) settlementPhase(ctx context.Context, game *domain.Game
 
 	winnersCount := 0
 	losersCount := 0
+	totalPayouts := decimal.Zero
 
 	for _, bet := range bets {
 		if bet.CashoutAt != nil {
-			// User cashed out - they win
+			// User cashed out - payout already processed during cashout
 			winnersCount++
-			// Payout already processed during cashout
+			totalPayouts = totalPayouts.Add(bet.Payout)
 		} else {
-			// User didn't cash out - they lose
-			losersCount++
+			// User didn't cash out - they lose their stake
+			// No payout needed, just mark as lost
 			bet.Status = domain.GameBetStatusLost
+			losersCount++
+
+			// Update bet status in repository
+			if err := e.betRepo.UpdateStatus(ctx, bet.ID, domain.GameBetStatusLost); err != nil {
+				log.Printf("Error updating bet status to lost: %v", err)
+				continue
+			}
 		}
 	}
 
-	log.Printf("Round %d settled: %d winners, %d losers", game.RoundNumber, winnersCount, losersCount)
+	log.Printf("Round %d settled: %d winners, %d losers, total payouts: %s",
+		game.RoundNumber, winnersCount, losersCount, totalPayouts.String())
 }
 
 // ProcessCashout handles a user cashing out during the flight phase
 func (e *CrashGameEngine) ProcessCashout(ctx context.Context, betID uuid.UUID, currentMultiplier decimal.Decimal) error {
-	// 1. Calculate payout: bet.Amount * currentMultiplier
-	// 2. Update bet status to CASHED_OUT
-	// 3. Credit wallet immediately
-
-	payout := decimal.NewFromInt(100).Mul(currentMultiplier) // Example
-
-	if err := e.betRepo.UpdateCashout(ctx, betID, currentMultiplier, payout); err != nil {
-		return err
+	// Get the bet details first
+	bet, err := e.betRepo.GetByID(ctx, betID)
+	if err != nil {
+		return fmt.Errorf("get bet: %w", err)
 	}
 
-	log.Printf("Cashout processed: Bet %s at %s = %s", betID, currentMultiplier.String(), payout.String())
+	if bet.Status != domain.GameBetStatusActive {
+		return fmt.Errorf("bet is not active: %s", bet.Status)
+	}
+
+	// Get the game to determine country code (since GameBet doesn't have CountryCode)
+	game, err := e.gameRepo.GetByID(ctx, bet.GameID)
+	if err != nil {
+		return fmt.Errorf("get game: %w", err)
+	}
+
+	// Calculate gross payout: bet.Amount * currentMultiplier
+	grossPayout := bet.Amount.Mul(currentMultiplier)
+
+	// Apply winnings tax using tax engine
+	payoutBreakdown := e.taxEngine.ApplyPayoutTax(game.CountryCode, grossPayout, bet.Amount)
+	netPayout := payoutBreakdown.NetPayout
+
+	// Credit wallet with net payout
+	movement := wallet.Movement{
+		UserID:        bet.UserID,
+		Amount:        netPayout,
+		Type:          domain.TransactionTypeBetWon,
+		ReferenceID:   &betID,
+		ReferenceType: "game_bet",
+		Description:   fmt.Sprintf("Crash game cashout at %sx", currentMultiplier.String()),
+		ProviderName:  "crash_game",
+		ProviderTxnID: betID.String(),
+		CountryCode:   game.CountryCode,
+	}
+
+	transaction, err := e.walletService.Credit(ctx, bet.UserID, netPayout, movement)
+	if err != nil {
+		return fmt.Errorf("credit wallet: %w", err)
+	}
+
+	// Update bet with cashout details
+	if err := e.betRepo.UpdateCashout(ctx, betID, currentMultiplier, netPayout); err != nil {
+		return fmt.Errorf("update bet cashout: %w", err)
+	}
+
+	// Update bet status to CASHED_OUT
+	if err := e.betRepo.UpdateStatus(ctx, betID, domain.GameBetStatusCashedOut); err != nil {
+		return fmt.Errorf("update bet status: %w", err)
+	}
+
+	log.Printf("Cashout processed: Bet %s at %s = %s (tax: %s, net: %s, txn: %s)",
+		betID, currentMultiplier.String(), grossPayout.String(),
+		payoutBreakdown.WinningsTax.String(), netPayout.String(), transaction.ID.String())
 
 	return nil
 }
