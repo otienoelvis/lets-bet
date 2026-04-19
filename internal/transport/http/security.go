@@ -76,7 +76,7 @@ func (h *SecurityHandler) GetSecurityAuditHistory(w http.ResponseWriter, r *http
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    history,
 	}, http.StatusOK)
@@ -121,7 +121,7 @@ func (h *SecurityHandler) GetPenetrationTestResults(w http.ResponseWriter, r *ht
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    results,
 	}, http.StatusOK)
@@ -172,7 +172,7 @@ func (h *SecurityHandler) GetGDPRRequestStatus(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    status,
 	}, http.StatusOK)
@@ -223,7 +223,7 @@ func (h *SecurityHandler) GetUserGamingProfile(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    profile,
 	}, http.StatusOK)
@@ -252,7 +252,7 @@ func (h *SecurityHandler) SetGamingLimits(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "Gaming limits set successfully",
 	}, http.StatusOK)
@@ -268,7 +268,7 @@ func (h *SecurityHandler) GetSecurityMetrics(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    metrics,
 	}, http.StatusOK)
@@ -285,7 +285,7 @@ func (h *SecurityHandler) GetVulnerabilityReport(w http.ResponseWriter, r *http.
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    report,
 	}, http.StatusOK)

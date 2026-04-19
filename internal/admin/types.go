@@ -8,7 +8,7 @@ import (
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // AdminService handles administrative operations
@@ -54,7 +54,7 @@ type ActivityItem struct {
 	Description string          `json:"description"`
 	UserID      string          `json:"user_id"`
 	Timestamp   time.Time       `json:"timestamp"`
-	Amount      decimal.Decimal `json:"amount,omitempty"`
+	Amount      decimal.Decimal `json:"amount"`
 	Status      string          `json:"status"`
 }
 

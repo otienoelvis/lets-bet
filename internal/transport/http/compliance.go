@@ -45,7 +45,7 @@ func (h *ComplianceHandler) GetUserComplianceStatus(w http.ResponseWriter, r *ht
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    status,
 	}, http.StatusOK)
@@ -72,7 +72,7 @@ func (h *ComplianceHandler) SetUserLimits(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "User limits set successfully",
 	}, http.StatusOK)
@@ -99,7 +99,7 @@ func (h *ComplianceHandler) AddUserRestriction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "User restriction added successfully",
 	}, http.StatusOK)
@@ -122,7 +122,7 @@ func (h *ComplianceHandler) GenerateComplianceReport(w http.ResponseWriter, r *h
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    report,
 	}, http.StatusOK)
@@ -162,7 +162,7 @@ func (h *ComplianceHandler) GetComplianceMetrics(w http.ResponseWriter, r *http.
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    metrics,
 	}, http.StatusOK)
@@ -178,7 +178,7 @@ func (h *ComplianceHandler) GetComplianceAlerts(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    alerts,
 	}, http.StatusOK)
@@ -201,7 +201,7 @@ func (h *ComplianceHandler) AcknowledgeComplianceAlert(w http.ResponseWriter, r 
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "Compliance alert acknowledged successfully",
 	}, http.StatusOK)
@@ -225,7 +225,7 @@ func (h *ComplianceHandler) ResolveComplianceAlert(w http.ResponseWriter, r *htt
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "Compliance alert resolved successfully",
 	}, http.StatusOK)
@@ -242,7 +242,7 @@ func (h *ComplianceHandler) GetComplianceRules(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    rules,
 	}, http.StatusOK)
@@ -262,7 +262,7 @@ func (h *ComplianceHandler) CreateComplianceRule(w http.ResponseWriter, r *http.
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    req,
 		"message": "Compliance rule created successfully",
@@ -290,7 +290,7 @@ func (h *ComplianceHandler) UpdateComplianceRule(w http.ResponseWriter, r *http.
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    req,
 		"message": "Compliance rule updated successfully",
@@ -312,7 +312,7 @@ func (h *ComplianceHandler) DeleteComplianceRule(w http.ResponseWriter, r *http.
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "Compliance rule deleted successfully",
 	}, http.StatusOK)
@@ -328,7 +328,7 @@ func (h *ComplianceHandler) GetComplianceSettings(w http.ResponseWriter, r *http
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    settings,
 	}, http.StatusOK)
@@ -348,7 +348,7 @@ func (h *ComplianceHandler) UpdateComplianceSettings(w http.ResponseWriter, r *h
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"message": "Compliance settings updated successfully",
 	}, http.StatusOK)

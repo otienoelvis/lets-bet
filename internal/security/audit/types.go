@@ -9,7 +9,7 @@ import (
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // SecurityAuditService handles security audit operations
@@ -181,10 +181,10 @@ type SecurityMetrics struct {
 }
 
 // GetVulnerabilityReport retrieves vulnerability report
-func (s *SecurityAuditService) GetVulnerabilityReport(ctx context.Context) (interface{}, error) {
+func (s *SecurityAuditService) GetVulnerabilityReport(ctx context.Context) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
-		"vulnerabilities": []interface{}{},
+	return map[string]any{
+		"vulnerabilities": []any{},
 		"total_count":     0,
 		"critical_count":  0,
 		"high_count":      0,

@@ -117,7 +117,7 @@ return {1, limit - current, limit - current, now}
 	}
 
 	// Parse Lua script result
-	resultSlice := result.([]interface{})
+	resultSlice := result.([]any)
 	allowed := resultSlice[0].(int64) == 1
 	remaining := resultSlice[1].(int64)
 	var resetTime time.Time

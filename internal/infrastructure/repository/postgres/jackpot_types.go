@@ -53,7 +53,7 @@ type Jackpot struct {
 	IsActive         bool            `json:"is_active"`
 	WinningNumbers   []int           `json:"winning_numbers,omitempty"`
 	WinnerID         *string         `json:"winner_id,omitempty"`
-	WinnerAmount     decimal.Decimal `json:"winner_amount,omitempty"`
+	WinnerAmount     decimal.Decimal `json:"winner_amount"`
 }
 
 // JackpotTicket represents a jackpot ticket
@@ -68,7 +68,7 @@ type JackpotTicket struct {
 	UpdatedAt   time.Time       `json:"updated_at"`
 	DrawnAt     *time.Time      `json:"drawn_at,omitempty"`
 	WonAt       *time.Time      `json:"won_at,omitempty"`
-	PrizeAmount decimal.Decimal `json:"prize_amount,omitempty"`
+	PrizeAmount decimal.Decimal `json:"prize_amount"`
 }
 
 // JackpotContribution represents a contribution to the jackpot

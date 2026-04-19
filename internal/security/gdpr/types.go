@@ -7,7 +7,7 @@ import (
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // GDPRService handles GDPR compliance operations
@@ -128,7 +128,7 @@ type GDPRViolation struct {
 	Article     string        `json:"article"`
 	Date        time.Time     `json:"date"`
 	Status      FindingStatus `json:"status"`
-	Resolved    time.Time     `json:"resolved,omitempty"`
+	Resolved    time.Time     `json:"resolved"`
 }
 
 // GDPRConfig represents GDPR compliance configuration
@@ -157,15 +157,15 @@ type GDPRMetrics struct {
 }
 
 // ProcessRequest processes a GDPR request
-func (s *GDPRService) ProcessRequest(ctx context.Context, request interface{}) error {
+func (s *GDPRService) ProcessRequest(ctx context.Context, request any) error {
 	// Implementation stub
 	return nil
 }
 
 // GetRequestStatus retrieves the status of a GDPR request
-func (s *GDPRService) GetRequestStatus(ctx context.Context, requestID string) (interface{}, error) {
+func (s *GDPRService) GetRequestStatus(ctx context.Context, requestID string) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
+	return map[string]any{
 		"request_id": requestID,
 		"status":     "pending",
 	}, nil

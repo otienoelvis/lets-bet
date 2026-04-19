@@ -95,7 +95,7 @@ func (h *AdminHandler) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    userDetails,
 	}, http.StatusOK)
@@ -171,7 +171,7 @@ func (h *AdminHandler) GetBettingMetrics(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    metrics,
 	}, http.StatusOK)
@@ -212,7 +212,7 @@ func (h *AdminHandler) GetFinancialReports(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    report,
 	}, http.StatusOK)
@@ -228,7 +228,7 @@ func (h *AdminHandler) GetSystemHealth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    health,
 	}, http.StatusOK)
@@ -331,7 +331,7 @@ func (h *AdminHandler) GetAuditLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteJSON(w, map[string]interface{}{
+	WriteJSON(w, map[string]any{
 		"success": true,
 		"data":    logs,
 	}, http.StatusOK)

@@ -63,13 +63,13 @@ func (fwa *FlutterwaveAdapter) CreatePayment(ctx context.Context, req *PaymentRe
 		Status:  fwResp.Status,
 		Message: fwResp.Message,
 		Data: PaymentData{
-			ID:            fmt.Sprintf("%d", fwResp.Data.ID),
-			TxRef:         fwResp.Data.TxRef,
-			FlwRef:        fwResp.Data.FlwRef,
-			Amount:        decimal.RequireFromString(fwResp.Data.Amount),
-			Currency:      fwResp.Data.Currency,
-			Status:        fwResp.Status,
-			PaymentType:   "mobilemoneygh",
+			ID:          fmt.Sprintf("%d", fwResp.Data.ID),
+			TxRef:       fwResp.Data.TxRef,
+			FlwRef:      fwResp.Data.FlwRef,
+			Amount:      decimal.RequireFromString(fwResp.Data.Amount),
+			Currency:    fwResp.Data.Currency,
+			Status:      fwResp.Status,
+			PaymentType: "mobilemoneygh",
 			Customer: CustomerInfo{
 				ID:    fwResp.Data.ID,
 				Name:  fwResp.Data.Customer.Name,
@@ -102,13 +102,13 @@ func (fwa *FlutterwaveAdapter) VerifyPayment(ctx context.Context, txRef string) 
 		Status:  fwResp.Status,
 		Message: fwResp.Message,
 		Data: TransactionVerificationData{
-			ID:            fmt.Sprintf("%d", fwResp.Data.ID),
-			TxRef:         fwResp.Data.TxRef,
-			FlwRef:        fwResp.Data.FlwRef,
-			Amount:        decimal.RequireFromString(fwResp.Data.Amount),
-			Currency:      fwResp.Data.Currency,
-			Status:        fwResp.Data.Status,
-			PaymentType:   fwResp.Data.PaymentType,
+			ID:          fmt.Sprintf("%d", fwResp.Data.ID),
+			TxRef:       fwResp.Data.TxRef,
+			FlwRef:      fwResp.Data.FlwRef,
+			Amount:      decimal.RequireFromString(fwResp.Data.Amount),
+			Currency:    fwResp.Data.Currency,
+			Status:      fwResp.Data.Status,
+			PaymentType: fwResp.Data.PaymentType,
 			Customer: CustomerInfo{
 				ID:    fwResp.Data.ID,
 				Name:  fwResp.Data.Customer.Name,
@@ -156,7 +156,7 @@ func (fwa *FlutterwaveAdapter) ProcessPayout(ctx context.Context, req *Flutterwa
 }
 
 // makeRequest makes an HTTP request to Flutterwave API
-func (fwa *FlutterwaveAdapter) makeRequest(ctx context.Context, method, endpoint string, body interface{}) ([]byte, error) {
+func (fwa *FlutterwaveAdapter) makeRequest(ctx context.Context, method, endpoint string, body any) ([]byte, error) {
 	var reqBody []byte
 	var err error
 
@@ -211,7 +211,7 @@ func (fwa *FlutterwaveAdapter) verifyWebhookSignature(payload []byte, signature 
 func (fwa *FlutterwaveAdapter) GetMetrics(ctx context.Context) (*FlutterwaveMetrics, error) {
 	// In a real implementation, these would be calculated from actual data
 	return &FlutterwaveMetrics{
-		TotalTransactions:       1000,
+		TotalTransactions:      1000,
 		SuccessfulTransactions: 950,
 		FailedTransactions:     50,
 		TotalAmount:            decimal.NewFromInt(50000),

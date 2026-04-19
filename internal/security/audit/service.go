@@ -109,7 +109,7 @@ func (s *SecurityAuditService) GetAuditHistory(ctx context.Context, limit int) (
 // ScheduleAudit schedules a future security audit
 func (s *SecurityAuditService) ScheduleAudit(ctx context.Context, scheduledTime time.Time) error {
 	// In a real implementation, this would schedule the audit in the job queue
-	s.publishSecurityEvent("security.audit.scheduled", map[string]interface{}{
+	s.publishSecurityEvent("security.audit.scheduled", map[string]any{
 		"scheduled_time": scheduledTime,
 		"auditor":        "Security Audit Service",
 	})
@@ -148,7 +148,7 @@ func (s *SecurityAuditService) calculateSecurityScore(findings []SecurityFinding
 }
 
 // publishSecurityEvent publishes security audit events
-func (s *SecurityAuditService) publishSecurityEvent(topic string, data interface{}) {
+func (s *SecurityAuditService) publishSecurityEvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

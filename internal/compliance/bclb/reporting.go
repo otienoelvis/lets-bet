@@ -153,7 +153,7 @@ func (s *BCLBService) GetUserComplianceStatus(ctx context.Context, userID string
 func (s *BCLBService) UpdateUserLimits(ctx context.Context, userID string, limits UserLimits) error {
 	// In a real implementation, this would update the database
 	// For now, just log the update
-	s.publishComplianceEvent("compliance.limits_updated", map[string]interface{}{
+	s.publishComplianceEvent("compliance.limits_updated", map[string]any{
 		"user_id": userID,
 		"limits":  limits,
 	})
@@ -166,7 +166,7 @@ func (s *BCLBService) SetSelfExclusion(ctx context.Context, userID string, durat
 	// In a real implementation, this would update the database
 	endDate := time.Now().Add(duration)
 
-	s.publishComplianceEvent("compliance.self_exclusion_set", map[string]interface{}{
+	s.publishComplianceEvent("compliance.self_exclusion_set", map[string]any{
 		"user_id":  userID,
 		"duration": duration,
 		"end_date": endDate,
@@ -179,7 +179,7 @@ func (s *BCLBService) SetSelfExclusion(ctx context.Context, userID string, durat
 // RemoveSelfExclusion removes self-exclusion for a user
 func (s *BCLBService) RemoveSelfExclusion(ctx context.Context, userID string) error {
 	// In a real implementation, this would update the database
-	s.publishComplianceEvent("compliance.self_exclusion_removed", map[string]interface{}{
+	s.publishComplianceEvent("compliance.self_exclusion_removed", map[string]any{
 		"user_id": userID,
 	})
 

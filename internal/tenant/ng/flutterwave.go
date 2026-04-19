@@ -33,7 +33,7 @@ func NewFlutterwaveAdapter(config *FlutterwaveConfig) *FlutterwaveAdapter {
 // CreatePayment creates a new payment with Flutterwave
 func (fwa *FlutterwaveAdapter) CreatePayment(ctx context.Context, req *PaymentRequest) (*PaymentResponse, error) {
 	// Convert to Flutterwave request format
-	fwReq := map[string]interface{}{
+	fwReq := map[string]any{
 		"tx_ref":          req.TxRef,
 		"amount":          req.Amount.StringFixed(2),
 		"currency":        req.Currency,
@@ -54,7 +54,7 @@ func (fwa *FlutterwaveAdapter) CreatePayment(ctx context.Context, req *PaymentRe
 		return nil, fmt.Errorf("failed to create payment: %w", err)
 	}
 
-	var fwResp map[string]interface{}
+	var fwResp map[string]any
 	if err := json.Unmarshal(resp, &fwResp); err != nil {
 		return nil, fmt.Errorf("failed to parse response: %w", err)
 	}
@@ -66,7 +66,7 @@ func (fwa *FlutterwaveAdapter) CreatePayment(ctx context.Context, req *PaymentRe
 	}
 
 	// Parse data if available
-	if data, ok := fwResp["data"].(map[string]interface{}); ok {
+	if data, ok := fwResp["data"].(map[string]any); ok {
 		paymentResp.Data = PaymentData{
 			ID:            fmt.Sprintf("%.0f", data["id"]),
 			TxRef:         data["tx_ref"].(string),
@@ -91,7 +91,7 @@ func (fwa *FlutterwaveAdapter) VerifyPayment(ctx context.Context, txRef string) 
 		return nil, fmt.Errorf("failed to verify payment: %w", err)
 	}
 
-	var fwResp map[string]interface{}
+	var fwResp map[string]any
 	if err := json.Unmarshal(resp, &fwResp); err != nil {
 		return nil, fmt.Errorf("failed to parse verification response: %w", err)
 	}
@@ -103,7 +103,7 @@ func (fwa *FlutterwaveAdapter) VerifyPayment(ctx context.Context, txRef string) 
 	}
 
 	// Parse data if available
-	if data, ok := fwResp["data"].(map[string]interface{}); ok {
+	if data, ok := fwResp["data"].(map[string]any); ok {
 		verificationResp.Data = TransactionVerificationData{
 			ID:            fmt.Sprintf("%.0f", data["id"]),
 			TxRef:         data["tx_ref"].(string),
@@ -122,7 +122,7 @@ func (fwa *FlutterwaveAdapter) VerifyPayment(ctx context.Context, txRef string) 
 
 // ProcessRefund processes a refund
 func (fwa *FlutterwaveAdapter) ProcessRefund(ctx context.Context, req *RefundRequest) (*RefundResponse, error) {
-	fwReq := map[string]interface{}{
+	fwReq := map[string]any{
 		"id":     req.ID,
 		"amount": req.Amount.StringFixed(2),
 		"reason": req.Reason,
@@ -133,7 +133,7 @@ func (fwa *FlutterwaveAdapter) ProcessRefund(ctx context.Context, req *RefundReq
 		return nil, fmt.Errorf("failed to process refund: %w", err)
 	}
 
-	var fwResp map[string]interface{}
+	var fwResp map[string]any
 	if err := json.Unmarshal(resp, &fwResp); err != nil {
 		return nil, fmt.Errorf("failed to parse refund response: %w", err)
 	}
@@ -143,7 +143,7 @@ func (fwa *FlutterwaveAdapter) ProcessRefund(ctx context.Context, req *RefundReq
 		Message: fwResp["message"].(string),
 	}
 
-	if data, ok := fwResp["data"].(map[string]interface{}); ok {
+	if data, ok := fwResp["data"].(map[string]any); ok {
 		refundResp.Data = RefundData{
 			ID:        fmt.Sprintf("%.0f", data["id"]),
 			TxRef:     data["tx_ref"].(string),
@@ -160,7 +160,7 @@ func (fwa *FlutterwaveAdapter) ProcessRefund(ctx context.Context, req *RefundReq
 }
 
 // makeRequest makes an HTTP request to Flutterwave API
-func (fwa *FlutterwaveAdapter) makeRequest(ctx context.Context, method, endpoint string, body interface{}) ([]byte, error) {
+func (fwa *FlutterwaveAdapter) makeRequest(ctx context.Context, method, endpoint string, body any) ([]byte, error) {
 	var reqBody []byte
 	var err error
 
@@ -215,7 +215,7 @@ func (fwa *FlutterwaveAdapter) verifyWebhookSignature(payload []byte, signature 
 func (fwa *FlutterwaveAdapter) GetMetrics(ctx context.Context) (*FlutterwaveMetrics, error) {
 	// In a real implementation, these would be calculated from actual data
 	return &FlutterwaveMetrics{
-		TotalTransactions:       1500,
+		TotalTransactions:      1500,
 		SuccessfulTransactions: 1425,
 		FailedTransactions:     75,
 		TotalAmount:            decimal.NewFromInt(75000),

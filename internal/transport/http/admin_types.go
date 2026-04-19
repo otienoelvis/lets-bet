@@ -186,14 +186,14 @@ type FinancialHealth struct {
 
 // RecentActivity represents recent system activity
 type RecentActivity struct {
-	ID          string                 `json:"id"`
-	Type        string                 `json:"type"`
-	Description string                 `json:"description"`
-	UserID      string                 `json:"user_id,omitempty"`
-	Amount      float64                `json:"amount,omitempty"`
-	Status      string                 `json:"status"`
-	Timestamp   time.Time              `json:"timestamp"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	ID          string         `json:"id"`
+	Type        string         `json:"type"`
+	Description string         `json:"description"`
+	UserID      string         `json:"user_id,omitempty"`
+	Amount      float64        `json:"amount,omitempty"`
+	Status      string         `json:"status"`
+	Timestamp   time.Time      `json:"timestamp"`
+	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
 // TopUser represents top betting users
@@ -275,9 +275,9 @@ type UserManagementRequest struct {
 
 // UserManagementResponse represents user management response
 type UserManagementResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // UserData represents user data for management
@@ -335,13 +335,13 @@ type UserActionResponse struct {
 
 // SystemConfigRequest represents system configuration request
 type SystemConfigRequest struct {
-	Section string                 `json:"section"`
-	Config  map[string]interface{} `json:"config"`
+	Section string         `json:"section"`
+	Config  map[string]any `json:"config"`
 }
 
 // SystemConfigResponse represents system configuration response
 type SystemConfigResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Config  interface{} `json:"config,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Config  any    `json:"config,omitempty"`
 }

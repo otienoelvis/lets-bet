@@ -94,8 +94,8 @@ type OddsRequest struct {
 	LeagueID string    `json:"league_id,omitempty"`
 	MatchID  string    `json:"match_id,omitempty"`
 	Market   string    `json:"market,omitempty"`
-	From     time.Time `json:"from,omitempty"`
-	To       time.Time `json:"to,omitempty"`
+	From     time.Time `json:"from"`
+	To       time.Time `json:"to"`
 	Live     bool      `json:"live,omitempty"`
 }
 
@@ -145,8 +145,8 @@ type OutcomeData struct {
 type MatchRequest struct {
 	SportID  string    `json:"sport_id"`
 	LeagueID string    `json:"league_id,omitempty"`
-	From     time.Time `json:"from,omitempty"`
-	To       time.Time `json:"to,omitempty"`
+	From     time.Time `json:"from"`
+	To       time.Time `json:"to"`
 	Live     bool      `json:"live,omitempty"`
 }
 

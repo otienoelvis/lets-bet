@@ -21,7 +21,7 @@ type JackpotRepository interface {
 }
 
 type SportBetRepository interface {
-	Create(ctx context.Context, bet interface{}) error
+	Create(ctx context.Context, bet any) error
 }
 
 // WalletService interface for wallet operations
@@ -32,7 +32,7 @@ type WalletService interface {
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // Movement represents a wallet movement
@@ -44,7 +44,7 @@ type Movement struct {
 	Status      string          `json:"status"`
 	Reference   string          `json:"reference"`
 	CreatedAt   time.Time       `json:"created_at"`
-	CompletedAt time.Time       `json:"completed_at,omitempty"`
+	CompletedAt time.Time       `json:"completed_at"`
 }
 
 // Transaction represents a wallet transaction
@@ -57,7 +57,7 @@ type Transaction struct {
 	Reference   string          `json:"reference"`
 	MovementID  string          `json:"movement_id"`
 	CreatedAt   time.Time       `json:"created_at"`
-	CompletedAt time.Time       `json:"completed_at,omitempty"`
+	CompletedAt time.Time       `json:"completed_at"`
 }
 
 // Jackpot represents a jackpot game
@@ -72,11 +72,11 @@ type Jackpot struct {
 	ContributionRate decimal.Decimal `json:"contribution_rate"`
 	Status           JackpotStatus   `json:"status"`
 	StartTime        time.Time       `json:"start_time"`
-	EndTime          time.Time       `json:"end_time,omitempty"`
+	EndTime          time.Time       `json:"end_time"`
 	NextDrawTime     time.Time       `json:"next_draw_time"`
 	WinningTicketID  string          `json:"winning_ticket_id,omitempty"`
 	WinningUserID    string          `json:"winning_user_id,omitempty"`
-	WinningAmount    decimal.Decimal `json:"winning_amount,omitempty"`
+	WinningAmount    decimal.Decimal `json:"winning_amount"`
 	CreatedAt        time.Time       `json:"created_at"`
 	UpdatedAt        time.Time       `json:"updated_at"`
 }

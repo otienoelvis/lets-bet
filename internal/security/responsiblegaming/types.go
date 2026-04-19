@@ -9,7 +9,7 @@ import (
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // ResponsibleGamingService handles responsible gaming operations
@@ -201,7 +201,7 @@ type RGViolation struct {
 	UserID      string        `json:"user_id"`
 	Date        time.Time     `json:"date"`
 	Status      FindingStatus `json:"status"`
-	Resolved    time.Time     `json:"resolved,omitempty"`
+	Resolved    time.Time     `json:"resolved"`
 }
 
 // ResponsibleGamingConfig represents responsible gaming configuration
@@ -218,22 +218,22 @@ type ResponsibleGamingConfig struct {
 }
 
 // ProcessRequest processes a responsible gaming request
-func (s *ResponsibleGamingService) ProcessRequest(ctx context.Context, request interface{}) error {
+func (s *ResponsibleGamingService) ProcessRequest(ctx context.Context, request any) error {
 	// Implementation stub
 	return nil
 }
 
 // GetUserGamingProfile retrieves a user's gaming profile
-func (s *ResponsibleGamingService) GetUserGamingProfile(ctx context.Context, userID string) (interface{}, error) {
+func (s *ResponsibleGamingService) GetUserGamingProfile(ctx context.Context, userID string) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
+	return map[string]any{
 		"user_id": userID,
-		"profile": map[string]interface{}{},
+		"profile": map[string]any{},
 	}, nil
 }
 
 // SetGamingLimits sets gaming limits for a user
-func (s *ResponsibleGamingService) SetGamingLimits(ctx context.Context, userID string, limits interface{}) error {
+func (s *ResponsibleGamingService) SetGamingLimits(ctx context.Context, userID string, limits any) error {
 	// Implementation stub
 	return nil
 }

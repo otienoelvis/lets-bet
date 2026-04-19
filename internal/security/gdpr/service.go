@@ -81,11 +81,11 @@ func (s *GDPRService) GetUserGDPRStatus(ctx context.Context, userID string) (*GD
 // HandleDataSubjectRequest handles data subject requests (DSAR)
 func (s *GDPRService) HandleDataSubjectRequest(ctx context.Context, userID string, requestType string) error {
 	// In a real implementation, this would process the DSAR
-	request := map[string]interface{}{
-		"user_id":     userID,
+	request := map[string]any{
+		"user_id":      userID,
 		"request_type": requestType,
-		"status":      "processing",
-		"received_at": time.Now(),
+		"status":       "processing",
+		"received_at":  time.Now(),
 	}
 
 	// Publish DSAR event
@@ -98,7 +98,7 @@ func (s *GDPRService) HandleDataSubjectRequest(ctx context.Context, userID strin
 // HandleConsentWithdrawal handles consent withdrawal
 func (s *GDPRService) HandleConsentWithdrawal(ctx context.Context, userID string, consentType string) error {
 	// In a real implementation, this would process the consent withdrawal
-	withdrawal := map[string]interface{}{
+	withdrawal := map[string]any{
 		"user_id":      userID,
 		"consent_type": consentType,
 		"withdrawn_at": time.Now(),
@@ -116,15 +116,15 @@ func (s *GDPRService) HandleConsentWithdrawal(ctx context.Context, userID string
 func (s *GDPRService) ReportDataBreach(ctx context.Context, breachType string, affected int, severity SeverityLevel) error {
 	// In a real implementation, this would report the breach to authorities
 	breach := DataBreach{
-		ID:          generateID(),
-		Type:        breachType,
-		Severity:    severity,
-		Description: "Data breach detected and reported",
-		Affected:    affected,
-		Reported:    time.Now(),
-		Resolved:    time.Time{}, // Not yet resolved
+		ID:           generateID(),
+		Type:         breachType,
+		Severity:     severity,
+		Description:  "Data breach detected and reported",
+		Affected:     affected,
+		Reported:     time.Now(),
+		Resolved:     time.Time{}, // Not yet resolved
 		Notification: "Notification sent to authorities",
-		Status:      FindingStatusOpen,
+		Status:       FindingStatusOpen,
 	}
 
 	// Publish breach event
@@ -138,21 +138,21 @@ func (s *GDPRService) ReportDataBreach(ctx context.Context, breachType string, a
 func (s *GDPRService) GetGDPRMetrics(ctx context.Context) (*GDPRMetrics, error) {
 	// In a real implementation, these would be calculated from actual data
 	return &GDPRMetrics{
-		TotalDataSubjects:       100000,
-		ActiveConsents:          85000,
-		ExpiredConsents:         15000,
+		TotalDataSubjects:        100000,
+		ActiveConsents:           85000,
+		ExpiredConsents:          15000,
 		DataProcessingActivities: 25,
-		DataBreaches:            3,
-		OpenViolations:         5,
-		ClosedViolations:       20,
-		ComplianceScore:        85.5,
-		LastAssessment:         time.Now().AddDate(0, -1, 0),
-		NextAssessment:         time.Now().AddDate(0, 5, 0),
+		DataBreaches:             3,
+		OpenViolations:           5,
+		ClosedViolations:         20,
+		ComplianceScore:          85.5,
+		LastAssessment:           time.Now().AddDate(0, -1, 0),
+		NextAssessment:           time.Now().AddDate(0, 5, 0),
 	}, nil
 }
 
 // publishGDPREvent publishes GDPR events
-func (s *GDPRService) publishGDPREvent(topic string, data interface{}) {
+func (s *GDPRService) publishGDPREvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

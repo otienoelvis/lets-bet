@@ -15,9 +15,9 @@ type SecurityAuditRequest struct {
 
 // SecurityAuditResponse represents security audit response
 type SecurityAuditResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // SecurityAudit represents comprehensive security audit results
@@ -123,9 +123,9 @@ type PenetrationTestRequest struct {
 
 // PenetrationTestResponse represents penetration test response
 type PenetrationTestResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // PenetrationTest represents penetration test results
@@ -185,12 +185,12 @@ type Exploit struct {
 
 // PenetrationTestReport represents penetration test report
 type PenetrationTestReport struct {
-	ExecutiveSummary string                 `json:"executive_summary"`
-	TechnicalDetails string                 `json:"technical_details"`
-	RiskAssessment   *RiskAssessment        `json:"risk_assessment"`
-	Methodology      string                 `json:"methodology"`
-	Limitations      []string               `json:"limitations"`
-	Appendices       map[string]interface{} `json:"appendices"`
+	ExecutiveSummary string          `json:"executive_summary"`
+	TechnicalDetails string          `json:"technical_details"`
+	RiskAssessment   *RiskAssessment `json:"risk_assessment"`
+	Methodology      string          `json:"methodology"`
+	Limitations      []string        `json:"limitations"`
+	Appendices       map[string]any  `json:"appendices"`
 }
 
 // PentestRecommendation represents penetration test recommendation
@@ -240,35 +240,35 @@ type GDPRRequest struct {
 
 // GDPRResponse represents GDPR response
 type GDPRResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // GDPRResponseData represents GDPR response data
 type GDPRResponseData struct {
-	RequestID   string                 `json:"request_id"`
-	Status      string                 `json:"status"` // "PENDING", "PROCESSING", "COMPLETED", "REJECTED"
-	ProcessedAt *time.Time             `json:"processed_at,omitempty"`
-	ExpiresAt   *time.Time             `json:"expires_at,omitempty"`
-	Data        map[string]interface{} `json:"data,omitempty"`
-	Reason      string                 `json:"reason,omitempty"`
+	RequestID   string         `json:"request_id"`
+	Status      string         `json:"status"` // "PENDING", "PROCESSING", "COMPLETED", "REJECTED"
+	ProcessedAt *time.Time     `json:"processed_at,omitempty"`
+	ExpiresAt   *time.Time     `json:"expires_at,omitempty"`
+	Data        map[string]any `json:"data,omitempty"`
+	Reason      string         `json:"reason,omitempty"`
 }
 
 // ResponsibleGamingRequest represents responsible gaming request
 type ResponsibleGamingRequest struct {
-	UserID      string                 `json:"user_id"`
-	Action      string                 `json:"action"` // "SET_LIMIT", "EXCLUDE", "SELF_ASSESS", "TIMEOUT"
-	Parameters  map[string]interface{} `json:"parameters"`
-	Reason      string                 `json:"reason"`
-	RequestedAt time.Time              `json:"requested_at"`
+	UserID      string         `json:"user_id"`
+	Action      string         `json:"action"` // "SET_LIMIT", "EXCLUDE", "SELF_ASSESS", "TIMEOUT"
+	Parameters  map[string]any `json:"parameters"`
+	Reason      string         `json:"reason"`
+	RequestedAt time.Time      `json:"requested_at"`
 }
 
 // ResponsibleGamingResponse represents responsible gaming response
 type ResponsibleGamingResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // ResponsibleGamingData represents responsible gaming data

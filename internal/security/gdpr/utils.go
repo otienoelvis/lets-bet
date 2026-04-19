@@ -17,7 +17,7 @@ func generateID() string {
 // calculateComplianceScore calculates overall GDPR compliance score
 func calculateComplianceScore(assessment *GDPRCompliance) float64 {
 	score := 100.0
-	
+
 	// Deduct points for violations
 	for _, violation := range assessment.Violations {
 		switch violation.Severity {
@@ -33,7 +33,7 @@ func calculateComplianceScore(assessment *GDPRCompliance) float64 {
 			score -= 2
 		}
 	}
-	
+
 	// Add points for implemented rights
 	for _, right := range assessment.Rights {
 		switch right.Status {
@@ -43,7 +43,7 @@ func calculateComplianceScore(assessment *GDPRCompliance) float64 {
 			score += 2
 		}
 	}
-	
+
 	// Add points for active consents
 	activeConsents := 0
 	for _, consent := range assessment.ConsentRecords {
@@ -55,18 +55,18 @@ func calculateComplianceScore(assessment *GDPRCompliance) float64 {
 	if activeConsents > 0 {
 		score += 10
 	}
-	
+
 	if score < 0 {
 		score = 0
 	}
-	
+
 	return score
 }
 
 // calculateUserComplianceScore calculates compliance score for a specific user
 func calculateUserComplianceScore(assessment *GDPRCompliance) float64 {
 	score := 100.0
-	
+
 	// Check if user has active consents
 	activeConsents := 0
 	for _, consent := range assessment.ConsentRecords {
@@ -74,13 +74,13 @@ func calculateUserComplianceScore(assessment *GDPRCompliance) float64 {
 			activeConsents++
 		}
 	}
-	
+
 	if activeConsents == 0 {
 		score -= 50 // Major penalty for no consents
 	} else if activeConsents < 3 {
 		score -= 20 // Penalty for limited consents
 	}
-	
+
 	// Deduct points for user-specific violations
 	for _, violation := range assessment.Violations {
 		switch violation.Severity {
@@ -96,18 +96,18 @@ func calculateUserComplianceScore(assessment *GDPRCompliance) float64 {
 			score -= 5
 		}
 	}
-	
+
 	if score < 0 {
 		score = 0
 	}
-	
+
 	return score
 }
 
 // generateGDPRRecommendations generates GDPR compliance recommendations
 func generateGDPRRecommendations(assessment *GDPRCompliance) []string {
 	var recommendations []string
-	
+
 	// Add recommendations based on violations
 	for _, violation := range assessment.Violations {
 		switch violation.Type {
@@ -122,20 +122,20 @@ func generateGDPRRecommendations(assessment *GDPRCompliance) []string {
 			recommendations = append(recommendations, "Document all legal bases for data processing")
 		}
 	}
-	
+
 	// Add general recommendations
 	recommendations = append(recommendations, "Regular GDPR compliance audits")
 	recommendations = append(recommendations, "Staff training on GDPR requirements")
 	recommendations = append(recommendations, "Privacy by design implementation")
 	recommendations = append(recommendations, "Data protection impact assessments")
-	
+
 	return recommendations
 }
 
 // generateUserRecommendations generates user-specific recommendations
 func generateUserRecommendations(assessment *GDPRCompliance, userID string) []string {
 	var recommendations []string
-	
+
 	// Check if user needs to update consents
 	activeConsents := 0
 	for _, consent := range assessment.ConsentRecords {
@@ -143,12 +143,12 @@ func generateUserRecommendations(assessment *GDPRCompliance, userID string) []st
 			activeConsents++
 		}
 	}
-	
+
 	if activeConsents == 0 {
 		recommendations = append(recommendations, "Review and update consent preferences")
 		recommendations = append(recommendations, "Contact privacy officer for consent management")
 	}
-	
+
 	// Check for recent violations
 	for _, violation := range assessment.Violations {
 		if violation.Date.After(time.Now().AddDate(0, -1, 0)) { // Last month
@@ -162,7 +162,7 @@ func generateUserRecommendations(assessment *GDPRCompliance, userID string) []st
 			}
 		}
 	}
-	
+
 	return recommendations
 }
 
@@ -214,16 +214,16 @@ func CheckConsentExpiry(consentRecord ConsentRecord) bool {
 }
 
 // GenerateDSARReport generates a data subject access request report
-func GenerateDSARReport(ctx context.Context, userID string) (map[string]interface{}, error) {
+func GenerateDSARReport(ctx context.Context, userID string) (map[string]any, error) {
 	// In a real implementation, this would generate a comprehensive report
-	report := map[string]interface{}{
-		"user_id":    userID,
-		"generated":  time.Now(),
-		"data_types": []string{"Personal Data", "Betting History", "Transactions"},
+	report := map[string]any{
+		"user_id":       userID,
+		"generated":     time.Now(),
+		"data_types":    []string{"Personal Data", "Betting History", "Transactions"},
 		"export_format": "JSON",
 		"total_records": 150,
 	}
-	
+
 	return report, nil
 }
 

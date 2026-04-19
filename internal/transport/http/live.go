@@ -213,25 +213,25 @@ func (h *LiveHandler) GetMetrics(w http.ResponseWriter, r *http.Request) {
 }
 
 // convertToLiveMatches converts live service matches to HTTP response format
-func convertToLiveMatches(matches interface{}) []LiveMatch {
+func convertToLiveMatches(matches any) []LiveMatch {
 	// Implementation stub - return empty slice for now
 	return []LiveMatch{}
 }
 
 // convertToLiveMatch converts a live service match to HTTP response format
-func convertToLiveMatch(match interface{}) *LiveMatch {
+func convertToLiveMatch(match any) *LiveMatch {
 	// Implementation stub - return nil for now
 	return nil
 }
 
 // validateBetRequest validates a live bet request
-func (h *LiveHandler) validateBetRequest(req interface{}) error {
+func (h *LiveHandler) validateBetRequest(req any) error {
 	// Implementation stub
 	return nil
 }
 
 // validateOddsUpdateRequest validates an odds update request
-func (h *LiveHandler) validateOddsUpdateRequest(req interface{}) error {
+func (h *LiveHandler) validateOddsUpdateRequest(req any) error {
 	// Implementation stub
 	return nil
 }

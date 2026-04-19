@@ -57,7 +57,7 @@ func (s *BCLBService) logComplianceCheck(check *ComplianceCheck) {
 }
 
 // publishComplianceEvent publishes compliance events
-func (s *BCLBService) publishComplianceEvent(topic string, data interface{}) {
+func (s *BCLBService) publishComplianceEvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

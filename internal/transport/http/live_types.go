@@ -71,9 +71,9 @@ type LiveBetResponse struct {
 	Success      bool            `json:"success"`
 	Message      string          `json:"message"`
 	BetID        string          `json:"bet_id,omitempty"`
-	Amount       decimal.Decimal `json:"amount,omitempty"`
-	Odds         decimal.Decimal `json:"odds,omitempty"`
-	PotentialWin decimal.Decimal `json:"potential_win,omitempty"`
+	Amount       decimal.Decimal `json:"amount"`
+	Odds         decimal.Decimal `json:"odds"`
+	PotentialWin decimal.Decimal `json:"potential_win"`
 }
 
 // GetLiveMatchResponse represents a live match response

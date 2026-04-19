@@ -174,7 +174,7 @@ func (s *ResponsibleGamingService) SetBettingLimit(ctx context.Context, userID s
 }
 
 // publishRGEvent publishes responsible gaming events
-func (s *ResponsibleGamingService) publishRGEvent(topic string, data interface{}) {
+func (s *ResponsibleGamingService) publishRGEvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

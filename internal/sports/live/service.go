@@ -30,10 +30,10 @@ type LiveBetResponse struct {
 	Success      bool            `json:"success"`
 	BetID        string          `json:"bet_id,omitempty"`
 	Message      string          `json:"message"`
-	Balance      decimal.Decimal `json:"balance,omitempty"`
-	Odds         decimal.Decimal `json:"odds,omitempty"`
-	Amount       decimal.Decimal `json:"amount,omitempty"`
-	PotentialWin decimal.Decimal `json:"potential_win,omitempty"`
+	Balance      decimal.Decimal `json:"balance"`
+	Odds         decimal.Decimal `json:"odds"`
+	Amount       decimal.Decimal `json:"amount"`
+	PotentialWin decimal.Decimal `json:"potential_win"`
 }
 
 // OddsUpdateRequest represents a request to update odds

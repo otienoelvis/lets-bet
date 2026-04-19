@@ -8,7 +8,7 @@ import (
 
 // EventBus interface for publishing events
 type EventBus interface {
-	Publish(topic string, data interface{}) error
+	Publish(topic string, data any) error
 }
 
 // BCLBConfig represents BCLB compliance configuration

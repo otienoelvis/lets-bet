@@ -27,14 +27,14 @@ type BetValidationRequest struct {
 	Selections int             `json:"selections"`
 	MarketID   string          `json:"market_id,omitempty"`
 	EventID    string          `json:"event_id,omitempty"`
-	Odds       decimal.Decimal `json:"odds,omitempty"`
+	Odds       decimal.Decimal `json:"odds"`
 }
 
 // BetValidationResponse represents a bet validation response
 type BetValidationResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // BetValidation represents bet validation results
@@ -191,49 +191,49 @@ type Recommendation struct {
 
 // ComplianceAlert represents a compliance alert
 type ComplianceAlert struct {
-	ID             string                 `json:"id"`
-	Type           string                 `json:"type"`
-	Severity       string                 `json:"severity"`
-	UserID         string                 `json:"user_id,omitempty"`
-	Title          string                 `json:"title"`
-	Description    string                 `json:"description"`
-	TriggeredAt    time.Time              `json:"triggered_at"`
-	Status         string                 `json:"status"`
-	AcknowledgedBy string                 `json:"acknowledged_by,omitempty"`
-	AcknowledgedAt *time.Time             `json:"acknowledged_at,omitempty"`
-	ResolvedBy     string                 `json:"resolved_by,omitempty"`
-	ResolvedAt     *time.Time             `json:"resolved_at,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
+	ID             string         `json:"id"`
+	Type           string         `json:"type"`
+	Severity       string         `json:"severity"`
+	UserID         string         `json:"user_id,omitempty"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	TriggeredAt    time.Time      `json:"triggered_at"`
+	Status         string         `json:"status"`
+	AcknowledgedBy string         `json:"acknowledged_by,omitempty"`
+	AcknowledgedAt *time.Time     `json:"acknowledged_at,omitempty"`
+	ResolvedBy     string         `json:"resolved_by,omitempty"`
+	ResolvedAt     *time.Time     `json:"resolved_at,omitempty"`
+	Metadata       map[string]any `json:"metadata,omitempty"`
 }
 
 // ComplianceRule represents a compliance rule
 type ComplianceRule struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        string                 `json:"type"`
-	Category    string                 `json:"category"`
-	Enabled     bool                   `json:"enabled"`
-	Severity    string                 `json:"severity"`
-	Conditions  map[string]interface{} `json:"conditions"`
-	Actions     []string               `json:"actions"`
-	CreatedAt   time.Time              `json:"created_at"`
-	UpdatedAt   time.Time              `json:"updated_at"`
-	CreatedBy   string                 `json:"created_by"`
-	UpdatedBy   string                 `json:"updated_by"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Type        string         `json:"type"`
+	Category    string         `json:"category"`
+	Enabled     bool           `json:"enabled"`
+	Severity    string         `json:"severity"`
+	Conditions  map[string]any `json:"conditions"`
+	Actions     []string       `json:"actions"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	CreatedBy   string         `json:"created_by"`
+	UpdatedBy   string         `json:"updated_by"`
 }
 
 // ComplianceCheck represents a compliance check
 type ComplianceCheck struct {
-	CheckID   string                 `json:"check_id"`
-	UserID    string                 `json:"user_id"`
-	Type      string                 `json:"type"`
-	Status    string                 `json:"status"`
-	Result    *CheckResult           `json:"result"`
-	CheckedAt time.Time              `json:"checked_at"`
-	CheckedBy string                 `json:"checked_by"`
-	Notes     string                 `json:"notes,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	CheckID   string         `json:"check_id"`
+	UserID    string         `json:"user_id"`
+	Type      string         `json:"type"`
+	Status    string         `json:"status"`
+	Result    *CheckResult   `json:"result"`
+	CheckedAt time.Time      `json:"checked_at"`
+	CheckedBy string         `json:"checked_by"`
+	Notes     string         `json:"notes,omitempty"`
+	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
 // CheckResult represents check result

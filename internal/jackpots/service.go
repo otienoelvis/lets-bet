@@ -167,13 +167,13 @@ func (s *JackpotService) DrawJackpot(ctx context.Context, jackpotID string) (*Ja
 
 	if winner != nil {
 		draw.WinningTicket = winner
-		
+
 		// Update ticket status
 		winner.Status = TicketStatusWinner
 		winner.Prize = jackpot.CurrentAmount
 		winner.DrawTime = time.Now()
 		winner.UpdatedAt = time.Now()
-		
+
 		if err := s.jackpotRepo.UpdateTicketStatus(ctx, winner.ID, TicketStatusWinner, jackpot.CurrentAmount); err != nil {
 			return nil, fmt.Errorf("failed to update winning ticket: %w", err)
 		}
@@ -225,19 +225,19 @@ func (s *JackpotService) GetJackpotMetrics(ctx context.Context) (*JackpotMetrics
 	return &JackpotMetrics{
 		TotalJackpots:      15,
 		ActiveJackpots:     8,
-		TotalTickets:        50000,
-		ActiveTickets:       12000,
-		TotalPayouts:        decimal.NewFromInt(2500000),
-		TotalContributions:  decimal.NewFromInt(3000000),
+		TotalTickets:       50000,
+		ActiveTickets:      12000,
+		TotalPayouts:       decimal.NewFromInt(2500000),
+		TotalContributions: decimal.NewFromInt(3000000),
 		AverageJackpotSize: decimal.NewFromInt(125000),
-		LargestJackpot:      decimal.NewFromInt(500000),
-		LastDrawTime:        time.Now().Add(-2 * time.Hour),
-		NextDrawTime:        time.Now().Add(4 * time.Hour),
+		LargestJackpot:     decimal.NewFromInt(500000),
+		LastDrawTime:       time.Now().Add(-2 * time.Hour),
+		NextDrawTime:       time.Now().Add(4 * time.Hour),
 	}, nil
 }
 
 // publishJackpotEvent publishes jackpot events
-func (s *JackpotService) publishJackpotEvent(topic string, data interface{}) {
+func (s *JackpotService) publishJackpotEvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

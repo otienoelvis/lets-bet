@@ -83,7 +83,7 @@ func generateWinningNumbers(rng *rand.Rand, count int) []int {
 	numbers := make([]int, count)
 	seen := make(map[int]bool)
 
-	for i := 0; i < count; i++ {
+	for i := range count {
 		for {
 			num := rng.Intn(49) + 1 // 1-49
 			if !seen[num] {
@@ -133,7 +133,7 @@ func calculateOdds(totalNumbers int, numbersToChoose int) *big.Rat {
 	numerator := big.NewInt(1)
 	denominator := big.NewInt(1)
 
-	for i := 0; i < numbersToChoose; i++ {
+	for i := range numbersToChoose {
 		numerator.Mul(numerator, big.NewInt(int64(totalNumbers-i)))
 		denominator.Mul(denominator, big.NewInt(int64(i+1)))
 	}

@@ -160,19 +160,19 @@ func (s *BCLBService) ValidateBetPlacement(ctx context.Context, userID string, b
 }
 
 // SetUserLimits sets user betting limits
-func (s *BCLBService) SetUserLimits(ctx context.Context, userID string, limits interface{}) error {
+func (s *BCLBService) SetUserLimits(ctx context.Context, userID string, limits any) error {
 	// Implementation stub
 	return nil
 }
 
 // AddUserRestriction adds a user restriction
-func (s *BCLBService) AddUserRestriction(ctx context.Context, userID string, restriction interface{}) error {
+func (s *BCLBService) AddUserRestriction(ctx context.Context, userID string, restriction any) error {
 	// Implementation stub
 	return nil
 }
 
 // GetComplianceMetrics retrieves compliance metrics
-func (s *BCLBService) GetComplianceMetrics(ctx context.Context) (interface{}, error) {
+func (s *BCLBService) GetComplianceMetrics(ctx context.Context) (any, error) {
 	// Implementation stub
 	return map[string]any{
 		"total_checks":  0,
@@ -182,9 +182,9 @@ func (s *BCLBService) GetComplianceMetrics(ctx context.Context) (interface{}, er
 }
 
 // GetComplianceAlerts retrieves compliance alerts
-func (s *BCLBService) GetComplianceAlerts(ctx context.Context) (interface{}, error) {
+func (s *BCLBService) GetComplianceAlerts(ctx context.Context) (any, error) {
 	// Implementation stub
-	return []interface{}{}, nil
+	return []any{}, nil
 }
 
 // AcknowledgeComplianceAlert acknowledges a compliance alert
@@ -200,19 +200,19 @@ func (s *BCLBService) ResolveComplianceAlert(ctx context.Context, alertID string
 }
 
 // GetComplianceRules retrieves compliance rules
-func (s *BCLBService) GetComplianceRules(ctx context.Context) (interface{}, error) {
+func (s *BCLBService) GetComplianceRules(ctx context.Context) (any, error) {
 	// Implementation stub
-	return []interface{}{}, nil
+	return []any{}, nil
 }
 
 // CreateComplianceRule creates a compliance rule
-func (s *BCLBService) CreateComplianceRule(ctx context.Context, rule interface{}) error {
+func (s *BCLBService) CreateComplianceRule(ctx context.Context, rule any) error {
 	// Implementation stub
 	return nil
 }
 
 // UpdateComplianceRule updates a compliance rule
-func (s *BCLBService) UpdateComplianceRule(ctx context.Context, ruleID string, rule interface{}) error {
+func (s *BCLBService) UpdateComplianceRule(ctx context.Context, ruleID string, rule any) error {
 	// Implementation stub
 	return nil
 }
@@ -224,13 +224,13 @@ func (s *BCLBService) DeleteComplianceRule(ctx context.Context, ruleID string) e
 }
 
 // GetComplianceSettings retrieves compliance settings
-func (s *BCLBService) GetComplianceSettings(ctx context.Context) (interface{}, error) {
+func (s *BCLBService) GetComplianceSettings(ctx context.Context) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{}, nil
+	return map[string]any{}, nil
 }
 
 // UpdateComplianceSettings updates compliance settings
-func (s *BCLBService) UpdateComplianceSettings(ctx context.Context, settings interface{}) error {
+func (s *BCLBService) UpdateComplianceSettings(ctx context.Context, settings any) error {
 	// Implementation stub
 	return nil
 }

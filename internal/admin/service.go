@@ -76,7 +76,7 @@ func (s *AdminService) GetSystemMetrics(ctx context.Context) (*AdminMetrics, err
 // UpdateUserStatus updates a user's status
 func (s *AdminService) UpdateUserStatus(ctx context.Context, userID string, status string) error {
 	// In a real implementation, this would update the database
-	update := map[string]interface{}{
+	update := map[string]any{
 		"user_id": userID,
 		"status":  status,
 		"updated": time.Now(),
@@ -92,7 +92,7 @@ func (s *AdminService) UpdateUserStatus(ctx context.Context, userID string, stat
 // SuspendUser suspends a user account
 func (s *AdminService) SuspendUser(ctx context.Context, userID string, reason string) error {
 	// In a real implementation, this would update the database
-	suspension := map[string]interface{}{
+	suspension := map[string]any{
 		"user_id":      userID,
 		"reason":       reason,
 		"suspended_at": time.Now(),
@@ -137,10 +137,10 @@ func (s *AdminService) GetTransactionHistory(ctx context.Context, limit int) ([]
 }
 
 // GetUserManagementData retrieves user management data
-func (s *AdminService) GetUserManagementData(ctx context.Context, req *UserManagementRequest) (interface{}, error) {
+func (s *AdminService) GetUserManagementData(ctx context.Context, req *UserManagementRequest) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
-		"users": []interface{}{},
+	return map[string]any{
+		"users": []any{},
 		"total": 0,
 		"page":  req.Page,
 		"limit": req.PageSize,
@@ -155,9 +155,9 @@ func (s *AdminService) PerformUserAction(ctx context.Context, req *UserActionReq
 }
 
 // GetBettingMetrics retrieves betting metrics
-func (s *AdminService) GetBettingMetrics(ctx context.Context, req *BettingMetricsRequest) (interface{}, error) {
+func (s *AdminService) GetBettingMetrics(ctx context.Context, req *BettingMetricsRequest) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
+	return map[string]any{
 		"total_bets":   0,
 		"total_volume": decimal.Zero,
 		"period":       req.Period,
@@ -165,9 +165,9 @@ func (s *AdminService) GetBettingMetrics(ctx context.Context, req *BettingMetric
 }
 
 // GetFinancialReport retrieves financial report
-func (s *AdminService) GetFinancialReport(ctx context.Context, req *FinancialReportRequest) (interface{}, error) {
+func (s *AdminService) GetFinancialReport(ctx context.Context, req *FinancialReportRequest) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
+	return map[string]any{
 		"total_revenue": decimal.Zero,
 		"total_payout":  decimal.Zero,
 		"period":        req.Period,
@@ -176,9 +176,9 @@ func (s *AdminService) GetFinancialReport(ctx context.Context, req *FinancialRep
 }
 
 // GetSystemHealth retrieves system health information
-func (s *AdminService) GetSystemHealth(ctx context.Context) (interface{}, error) {
+func (s *AdminService) GetSystemHealth(ctx context.Context) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
+	return map[string]any{
 		"status":       "healthy",
 		"uptime":       time.Duration(0),
 		"memory_usage": int64(0),
@@ -187,25 +187,25 @@ func (s *AdminService) GetSystemHealth(ctx context.Context) (interface{}, error)
 }
 
 // GetSystemConfig retrieves system configuration
-func (s *AdminService) GetSystemConfig(ctx context.Context) (interface{}, error) {
+func (s *AdminService) GetSystemConfig(ctx context.Context) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
-		"config": map[string]interface{}{},
+	return map[string]any{
+		"config": map[string]any{},
 	}, nil
 }
 
 // UpdateSystemConfig updates system configuration
-func (s *AdminService) UpdateSystemConfig(ctx context.Context, config interface{}) error {
+func (s *AdminService) UpdateSystemConfig(ctx context.Context, config any) error {
 	// Implementation stub
 	log.Printf("Updating system config")
 	return nil
 }
 
 // GetAuditLogs retrieves audit logs
-func (s *AdminService) GetAuditLogs(ctx context.Context, req *AuditLogRequest) (interface{}, error) {
+func (s *AdminService) GetAuditLogs(ctx context.Context, req *AuditLogRequest) (any, error) {
 	// Implementation stub
-	return map[string]interface{}{
-		"logs":  []interface{}{},
+	return map[string]any{
+		"logs":  []any{},
 		"total": 0,
 		"page":  req.Page,
 		"limit": req.PageSize,
@@ -213,7 +213,7 @@ func (s *AdminService) GetAuditLogs(ctx context.Context, req *AuditLogRequest) (
 }
 
 // publishAdminEvent publishes admin events
-func (s *AdminService) publishAdminEvent(topic string, data interface{}) {
+func (s *AdminService) publishAdminEvent(topic string, data any) {
 	if s.eventBus != nil {
 		err := s.eventBus.Publish(topic, data)
 		if err != nil {

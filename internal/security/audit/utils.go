@@ -145,7 +145,7 @@ func GetFindingsByCategory(ctx context.Context, category SecurityCategory) ([]Se
 	var findings []SecurityFinding
 
 	// Generate sample findings for the requested category
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		finding := SecurityFinding{
 			ID:             generateID(),
 			Title:          fmt.Sprintf("Sample %s Finding %d", category, i+1),
@@ -170,7 +170,7 @@ func GetFindingsBySeverity(ctx context.Context, severity SeverityLevel) ([]Secur
 	var findings []SecurityFinding
 
 	// Generate sample findings for the requested severity
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		finding := SecurityFinding{
 			ID:             generateID(),
 			Title:          fmt.Sprintf("Sample %s Finding %d", severity, i+1),
