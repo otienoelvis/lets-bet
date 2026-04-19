@@ -37,8 +37,10 @@ const (
 	MatchStatusScheduled MatchStatus = "SCHEDULED"
 	MatchStatusLive      MatchStatus = "LIVE"
 	MatchStatusFinished  MatchStatus = "FINISHED"
+	MatchStatusCompleted MatchStatus = "COMPLETED"
 	MatchStatusPostponed MatchStatus = "POSTPONED"
 	MatchStatusCancelled MatchStatus = "CANCELLED"
+	MatchStatusAbandoned MatchStatus = "ABANDONED"
 )
 
 type MatchScore struct {
