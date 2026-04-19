@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	gateway "github.com/betting-platform/internal/infrastructure/http"
 	"github.com/gorilla/mux"
 )
 

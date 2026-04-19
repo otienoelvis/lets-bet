@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/betting-platform/internal/wallet"
+	wallethttp "github.com/betting-platform/internal/infrastructure/http"
 	"github.com/gorilla/mux"
 )
 
@@ -20,7 +20,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// Initialize handlers
-	handler := wallet.NewHandler()
+	handler := wallethttp.NewWalletHandler()
 
 	// Register routes
 	handler.RegisterRoutes(r)

@@ -10,42 +10,52 @@ import (
 	"time"
 
 	"github.com/betting-platform/internal/core/usecase"
-	"github.com/betting-platform/internal/games"
-	"github.com/betting-platform/internal/repository/mock"
+	"github.com/betting-platform/internal/core/usecase/games"
+	"github.com/betting-platform/internal/infrastructure/database"
+	gameshttp "github.com/betting-platform/internal/infrastructure/http"
+	"github.com/betting-platform/internal/infrastructure/repository/postgres"
+	"github.com/betting-platform/internal/infrastructure/websocket"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	log.Println("Starting Crash Games Service")
 
-	// Initialize router
-	r := mux.NewRouter()
-
-	// Initialize handlers
-	handler := games.NewHandler()
-
-	// Register routes
-	handler.RegisterRoutes(r)
-
 	// Initialize context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Initialize WebSocket hub
-	hub := games.NewHub()
+	hub := websocket.NewHub()
 	go hub.Run()
 	log.Println("WebSocket Hub started")
 
 	// Initialize Provably Fair service
 	fairService := usecase.NewProvablyFairService()
 
-	// Initialize repositories (mock for now)
-	// In production, connect to PostgreSQL
-	gameRepo := mock.NewMockGameRepository()
-	betRepo := mock.NewMockGameBetRepository()
+	// Initialize database connection
+	dbConfig := database.GetDefaultConfig()
+	db, err := database.NewPostgresConnection(dbConfig)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	// Initialize PostgreSQL repositories
+	gameRepo := postgres.NewGameRepository(db)
+	betRepo := postgres.NewGameBetRepository(db)
 
 	// Initialize Crash Game Engine
 	engine := games.NewCrashGameEngine(hub, fairService, gameRepo, betRepo)
+
+	// Initialize router
+	r := mux.NewRouter()
+
+	// Initialize handlers with engine
+	handler := gameshttp.NewGamesHandler(engine)
+
+	// Register routes
+	handler.RegisterRoutes(r)
 
 	// Start the game loop
 	go engine.Start(ctx)
