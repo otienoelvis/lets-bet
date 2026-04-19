@@ -1,0 +1,272 @@
+{
+  "monitors": [
+    {
+      "name": "High Error Rate",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.http.requests.5xx{*} / avg:betting.platform.http.requests{*} > 0.1",
+      "message": "High error rate detected on betting platform. Error rate is {{value}}%.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.2,
+          "warning": 0.1
+        }
+      }
+    },
+    {
+      "name": "High Latency",
+      "type": "metric alert",
+      "query": "p95(last_5m):avg:betting.platform.http.request.duration{*} > 0.5",
+      "message": "High latency detected on betting platform. 95th percentile latency is {{value}}s.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 1.0,
+          "warning": 0.5
+        }
+      }
+    },
+    {
+      "name": "Service Down",
+      "type": "service check",
+      "query": "('up').over('service:betting-platform').last(2).count_by_status() == 0",
+      "message": "Betting platform service is down.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:critical"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": 2,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": true,
+        "renotify_interval": 0,
+        "escalation_message": ""
+      }
+    },
+    {
+      "name": "High CPU Usage",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.cpu.usage{*} > 0.8",
+      "message": "High CPU usage detected. CPU usage is {{value}}%.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.9,
+          "warning": 0.8
+        }
+      }
+    },
+    {
+      "name": "High Memory Usage",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.memory.usage{*} > 0.8",
+      "message": "High memory usage detected. Memory usage is {{value}}%.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.9,
+          "warning": 0.8
+        }
+      }
+    },
+    {
+      "name": "Database Connection Issues",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.db.connections.active{*} / avg:betting.platform.db.connections.max{*} > 0.9",
+      "message": "Database connection pool nearly exhausted. Usage is {{value}}%.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:critical"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.95,
+          "warning": 0.9
+        }
+      }
+    },
+    {
+      "name": "Redis Connection Issues",
+      "type": "service check",
+      "query": "('redis.up').over('service:betting-platform').last(2).count_by_status() == 0",
+      "message": "Redis connection issues detected.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:critical"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": 2,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": true,
+        "renotify_interval": 0,
+        "escalation_message": ""
+      }
+    },
+    {
+      "name": "Payment Processing Failures",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.payment.failure.rate{*} > 0.2",
+      "message": "High payment failure rate detected. Failure rate is {{value}}%.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.3,
+          "warning": 0.2
+        }
+      }
+    },
+    {
+      "name": "Low Betting Volume",
+      "type": "metric alert",
+      "query": "avg(last_10m):avg:betting.platform.volume.rate{*} < 10",
+      "message": "Low betting volume detected. Volume is {{value}} KES/min.\n\n@slack-betting-platform-business",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 5,
+          "warning": 10
+        }
+      }
+    },
+    {
+      "name": "Low User Activity",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.users.online{*} < 100",
+      "message": "Low user activity detected. Only {{value}} users online.\n\n@slack-betting-platform-business",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 50,
+          "warning": 100
+        }
+      }
+    },
+    {
+      "name": "External API Failures",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.external.api.failure.rate{*} > 0.3",
+      "message": "High external API failure rate detected. Failure rate is {{value}}% for {{name}}.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.5,
+          "warning": 0.3
+        }
+      }
+    },
+    {
+      "name": "Disk Space Warning",
+      "type": "metric alert",
+      "query": "avg(last_5m):avg:betting.platform.disk.available{*} / avg:betting.platform.disk.total{*} < 0.2",
+      "message": "Low disk space detected. Only {{value}}% available on {{device}}.\n\n@pagerduty-service-betting-platform @slack-betting-platform-alerts",
+      "tags": ["env:production", "service:betting-platform", "severity:warning"],
+      "options": {
+        "notify_audit": false,
+        "locked": false,
+        "timeout_h": 0,
+        "no_data_timeframe": null,
+        "include_tags": true,
+        "new_host_delay": 300,
+        "require_full_window": false,
+        "notify_no_data": false,
+        "renotify_interval": 0,
+        "escalation_message": "",
+        "thresholds": {
+          "critical": 0.1,
+          "warning": 0.2
+        }
+      }
+    }
+  ]
+}

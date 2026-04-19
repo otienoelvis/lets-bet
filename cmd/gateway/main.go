@@ -2,67 +2,87 @@ package main
 
 import (
 	"context"
-	"log"
-	"net/http"
+	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
+	"github.com/betting-platform/internal/infrastructure/config"
+	"github.com/betting-platform/internal/infrastructure/http/health"
+	"github.com/betting-platform/internal/infrastructure/http/middleware"
+	"github.com/betting-platform/internal/infrastructure/logging"
+	"github.com/betting-platform/internal/infrastructure/metrics"
+	"github.com/betting-platform/internal/infrastructure/ratelimit"
+	"github.com/betting-platform/internal/infrastructure/server"
+	"github.com/betting-platform/internal/infrastructure/tracing"
 	"github.com/gorilla/mux"
 )
 
-const (
-	defaultPort = "8080"
-)
-
 func main() {
-	log.Println("Starting Betting Platform Gateway")
-
-	// Initialize router
-	r := mux.NewRouter()
-
-	// Initialize handlers
-	handler := gateway.NewGatewayHandler(nil, nil)
-
-	// Register routes
-	handler.RegisterRoutes(r)
-
-	// Start server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		os.Exit(1)
 	}
+	logger := logging.Setup(cfg.Logging.Level, cfg.Logging.Format)
+	logger.Info("starting gateway", "env", cfg.Service.Environment)
 
-	srv := &http.Server{
-		Addr:         ":" + port,
-		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout:  60 * time.Second,
-	}
-
-	// Graceful shutdown
-	go func() {
-		log.Printf("Gateway listening on port %s", port)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
-		}
-	}()
-
-	// Wait for interrupt signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	log.Println("Shutting down server...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+	// Initialize OpenTelemetry tracing
+	tracerCfg := tracing.DefaultConfig("gateway")
+	cleanup, err := tracing.InitTracer(ctx, tracerCfg)
+	if err != nil {
+		logger.Error("failed to initialize tracer", "error", err)
+		os.Exit(1)
+	}
+	defer cleanup()
+
+	// Initialize MaxMind GeoIP provider (optional)
+	geoProvider, err := middleware.NewMaxMindProvider(middleware.DefaultDBPath())
+	if err != nil {
+		logger.Warn("failed to load maxmind database", "error", err)
 	}
 
-	log.Println("Server exited cleanly")
+	// Initialize Redis rate limiter
+	rateLimiterConfig := ratelimit.DefaultConfig()
+	rateLimiterConfig.RedisAddr = cfg.Redis.Addr()
+	rateLimiterConfig.RedisPassword = cfg.Redis.Password
+	rateLimiterConfig.RedisDB = cfg.Redis.DB
+
+	rateLimiter, err := ratelimit.NewRedisLimiter(ctx, rateLimiterConfig)
+	if err != nil {
+		logger.Error("failed to initialize Redis rate limiter", "error", err)
+		os.Exit(1)
+	}
+	defer rateLimiter.Close()
+
+	r := mux.NewRouter()
+
+	rec := metrics.New("gateway")
+	rec.RegisterRoutes(r)
+
+	// Apply middleware stack
+	r.Use(tracing.HTTPMiddleware("gateway"))
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Recovery)
+	r.Use(middleware.Logging)
+	r.Use(middleware.CORS(cfg.Security))
+	r.Use(rec.Middleware)
+	r.Use(middleware.Geolocation(middleware.GeoConfig{
+		Provider: geoProvider,
+		Allowed:  cfg.Tenant.AllowedCountries,
+	}))
+
+	// Apply Redis rate limiter middleware
+	r.Use(rateLimiter.HTTPMiddleware())
+
+	health.NewHandler("gateway", "dev").RegisterRoutes(r)
+
+	// Gateway handlers will be added when implemented
+
+	addr := fmt.Sprintf(":%d", cfg.Service.Port)
+	if err := server.RunHTTP(ctx, addr, r, logger); err != nil {
+		logger.Error("server terminated with error", "error", err)
+		os.Exit(1)
+	}
 }

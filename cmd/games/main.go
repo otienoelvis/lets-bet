@@ -2,92 +2,114 @@ package main
 
 import (
 	"context"
-	"log"
-	"net/http"
+	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/betting-platform/internal/core/usecase"
-	"github.com/betting-platform/internal/games"
-	"github.com/betting-platform/internal/repository/mock"
+	"github.com/betting-platform/internal/core/usecase/games"
+	"github.com/betting-platform/internal/core/usecase/tax"
+	"github.com/betting-platform/internal/core/usecase/wallet"
+	"github.com/betting-platform/internal/infrastructure/config"
+	"github.com/betting-platform/internal/infrastructure/database"
+	"github.com/betting-platform/internal/infrastructure/events"
+	gameshttp "github.com/betting-platform/internal/infrastructure/http"
+	"github.com/betting-platform/internal/infrastructure/http/health"
+	"github.com/betting-platform/internal/infrastructure/http/middleware"
+	"github.com/betting-platform/internal/infrastructure/logging"
+	"github.com/betting-platform/internal/infrastructure/metrics"
+	"github.com/betting-platform/internal/infrastructure/repository/postgres"
+	"github.com/betting-platform/internal/infrastructure/server"
+	"github.com/betting-platform/internal/infrastructure/websocket"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	log.Println("Starting Crash Games Service")
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		os.Exit(1)
+	}
+	logger := logging.Setup(cfg.Logging.Level, cfg.Logging.Format)
+	logger.Info("starting games", "env", cfg.Service.Environment)
 
-	// Initialize router
-	r := mux.NewRouter()
-
-	// Initialize handlers
-	handler := games.NewHandler()
-
-	// Register routes
-	handler.RegisterRoutes(r)
-
-	// Initialize context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Initialize WebSocket hub
-	hub := games.NewHub()
+	hub := websocket.NewHub()
 	go hub.Run()
-	log.Println("WebSocket Hub started")
 
-	// Initialize Provably Fair service
 	fairService := usecase.NewProvablyFairService()
 
-	// Initialize repositories (mock for now)
-	// In production, connect to PostgreSQL
-	gameRepo := mock.NewMockGameRepository()
-	betRepo := mock.NewMockGameBetRepository()
+	db, err := database.NewPostgresConnection(database.Config{
+		Host:            cfg.Database.Host,
+		Port:            cfg.Database.Port,
+		User:            cfg.Database.User,
+		Password:        cfg.Database.Password,
+		DBName:          cfg.Database.Name,
+		SSLMode:         cfg.Database.SSLMode,
+		MaxOpenConns:    cfg.Database.MaxOpenConns,
+		MaxIdleConns:    cfg.Database.MaxIdleConns,
+		ConnMaxLifetime: cfg.Database.ConnMaxLifetime,
+	})
+	if err != nil {
+		logger.Error("failed to connect to database", "error", err)
+		os.Exit(1)
+	}
+	defer db.Close()
 
-	// Initialize Crash Game Engine
-	engine := games.NewCrashGameEngine(hub, fairService, gameRepo, betRepo)
+	gameRepo := postgres.NewGameRepository(db)
+	betRepo := postgres.NewGameBetRepository(db)
 
-	// Start the game loop
-	go engine.Start(ctx)
+	// Initialize wallet service and tax engine
+	walletService := wallet.New(db)
+	taxEngine := tax.Default()
 
-	log.Println("Crash Game Engine running")
-	log.Println("Players can connect via WebSocket to receive real-time updates")
+	// Initialize event bus
+	eventBus, err := events.Connect(cfg.NATS.URL, "games-service")
+	if err != nil {
+		logger.Error("failed to connect to NATS", "error", err)
+		os.Exit(1)
+	}
+	defer eventBus.Close()
 
-	// Start server
-	port := os.Getenv("GAMES_PORT")
-	if port == "" {
-		port = "8082"
+	// Initialize MaxMind provider (optional)
+	geoProvider, err := middleware.NewMaxMindProvider(middleware.DefaultDBPath())
+	if err != nil {
+		logger.Warn("failed to load maxmind database", "error", err)
 	}
 
-	srv := &http.Server{
-		Addr:         ":" + port,
-		Handler:      r,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+	engine := games.NewCrashGameEngine(hub, fairService, gameRepo, betRepo, walletService, taxEngine)
+	go engine.StartGame(ctx)
+
+	r := mux.NewRouter()
+
+	// Initialize metrics
+	rec := metrics.New("games")
+	rec.RegisterRoutes(r)
+
+	// Apply middleware stack
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Recovery)
+	r.Use(middleware.Logging)
+	r.Use(middleware.CORS(cfg.Security))
+	r.Use(rec.Middleware)
+	r.Use(middleware.Geolocation(middleware.GeoConfig{
+		Provider: geoProvider,
+		Allowed:  cfg.Tenant.AllowedCountries,
+	}))
+
+	rl := middleware.NewRateLimiter(ctx, cfg.Security.RateLimitRequests, cfg.Security.RateLimitWindow)
+	r.Use(rl.Middleware)
+
+	h := health.NewHandler("games", "dev")
+	h.Register(&health.PostgresChecker{DB: db})
+	h.RegisterRoutes(r)
+
+	gameshttp.NewGamesHandler(engine).RegisterRoutes(r)
+
+	addr := fmt.Sprintf(":%d", cfg.Service.Port)
+	if err := server.RunHTTP(ctx, addr, r, logger); err != nil {
+		logger.Error("server terminated with error", "error", err)
+		os.Exit(1)
 	}
-
-	go func() {
-		log.Printf("Games Service listening on port %s", port)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
-		}
-	}()
-
-	// Wait for interrupt signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	log.Println("Shutting down Games Service...")
-
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer shutdownCancel()
-
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
-	}
-
-	cancel()
-
-	log.Println("Games Service exited cleanly")
 }
