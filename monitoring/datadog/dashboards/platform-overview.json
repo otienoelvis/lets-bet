@@ -1,0 +1,155 @@
+{
+  "title": "Betting Platform Overview",
+  "description": "Overview dashboard for betting platform metrics",
+  "widgets": [
+    {
+      "definition": {
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:betting.platform.http.requests{*}.as_count()"
+          }
+        ],
+        "markers": []
+      },
+      "id": 1,
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "avg:betting.platform.http.request.duration{*}.rollup(avg, 300)"
+          }
+        ],
+        "markers": []
+      },
+      "id": 2,
+      "layout": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "requests": [
+          {
+            "q": "sum:betting.platform.users.online{*}"
+          }
+        ],
+        "markers": []
+      },
+      "id": 3,
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "requests": [
+          {
+            "q": "sum:betting.platform.bets.placed{*}.rollup(rate, 300)"
+          }
+        ],
+        "markers": []
+      },
+      "id": 4,
+      "layout": {
+        "x": 6,
+        "y": 8,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "requests": [
+          {
+            "q": "sum:betting.platform.volume.total{*}.rollup(rate, 300)"
+          }
+        ],
+        "markers": []
+      },
+      "id": 5,
+      "layout": {
+        "x": 12,
+        "y": 8,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "requests": [
+          {
+            "q": "sum:betting.platform.errors.rate{*}"
+          }
+        ],
+        "markers": []
+      },
+      "id": 6,
+      "layout": {
+        "x": 18,
+        "y": 8,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:betting.platform.cpu.usage{*}"
+          }
+        ],
+        "markers": []
+      },
+      "id": 7,
+      "layout": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "requests": [
+          {
+            "q": "sum:betting.platform.memory.usage{*}"
+          }
+        ],
+        "markers": []
+      },
+      "id": 8,
+      "layout": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ],
+  "template_variables": [],
+  "templated": false,
+  "notify_list": [],
+  "tags": ["betting-platform", "overview"],
+  "id": "betting-platform-overview"
+}
