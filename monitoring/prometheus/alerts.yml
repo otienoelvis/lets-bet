@@ -1,0 +1,268 @@
+groups:
+  - name: betting-platform.rules
+    rules:
+      # High error rate alert
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+      # High latency alert
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High latency detected"
+          description: "95th percentile latency is {{ $value }}s for the last 5 minutes"
+
+      # Service down alert
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: betting-platform
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.instance }} has been down for more than 1 minute"
+
+      # High CPU usage alert
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value | humanizePercentage }} for {{ $labels.instance }}"
+
+      # High memory usage alert
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}MB for {{ $labels.instance }}"
+
+      # Database connection pool exhaustion
+      - alert: DatabaseConnectionPoolExhaustion
+        expr: db_connections_active / db_connections_max > 0.9
+        for: 2m
+        labels:
+          severity: critical
+          service: betting-platform
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Database connection pool usage is {{ $value | humanizePercentage }}"
+
+      # Redis connection issues
+      - alert: RedisConnectionIssues
+        expr: redis_connected_clients == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: betting-platform
+        annotations:
+          summary: "Redis connection issues"
+          description: "No active connections to Redis"
+
+      # Payment processing failures
+      - alert: PaymentProcessingFailures
+        expr: rate(payment_failure_total[5m]) / rate(payment_attempts_total[5m]) > 0.2
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High payment failure rate"
+          description: "Payment failure rate is {{ $value | humanizePercentage }}"
+
+      # Betting volume anomaly
+      - alert: BettingVolumeAnomaly
+        expr: rate(betting_volume_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Low betting volume"
+          description: "Betting volume is {{ $value }} KES per minute, which is unusually low"
+
+      # User activity drop
+      - alert: UserActivityDrop
+        expr: sum(betting_users_online) < 100
+        for: 5m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Low user activity"
+          description: "Only {{ $value }} users are currently online"
+
+      # External API failures
+      - alert: ExternalAPIFailures
+        expr: rate(external_api_requests_failed_total[5m]) / rate(external_api_requests_total[5m]) > 0.3
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High external API failure rate"
+          description: "External API failure rate is {{ $value | humanizePercentage }} for {{ $labels.provider }}"
+
+      # Rate limiting breaches
+      - alert: RateLimitingBreaches
+        expr: rate(rate_limit_exceeded_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "High rate limiting breaches"
+          description: "Rate limiting is being breached {{ $value }} times per minute"
+
+      # Geolocation service issues
+      - alert: GeolocationServiceIssues
+        expr: rate(geolocation_requests_failed_total[5m]) / rate(geolocation_requests_total[5m]) > 0.2
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Geolocation service issues"
+          description: "Geolocation service failure rate is {{ $value | humanizePercentage }}"
+
+      # Tax engine issues
+      - alert: TaxEngineIssues
+        expr: rate(tax_calculation_failed_total[5m]) / rate(tax_calculation_attempts_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Tax engine issues"
+          description: "Tax calculation failure rate is {{ $value | humanizePercentage }}"
+
+      # Wallet service issues
+      - alert: WalletServiceIssues
+        expr: rate(wallet_transaction_failed_total[5m]) / rate(wallet_transaction_attempts_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Wallet service issues"
+          description: "Wallet transaction failure rate is {{ $value | humanizePercentage }}"
+
+      # Game engine issues
+      - alert: GameEngineIssues
+        expr: rate(game_engine_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Game engine issues"
+          description: "Game engine error rate is {{ $value }} errors per minute"
+
+      # SMS service issues
+      - alert: SMSServiceIssues
+        expr: rate(sms_delivery_failed_total[5m]) / rate(sms_attempts_total[5m]) > 0.2
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "SMS service issues"
+          description: "SMS delivery failure rate is {{ $value | humanizePercentage }}"
+
+      # Disk space warning
+      - alert: DiskSpaceWarning
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: betting-platform
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is {{ $value | humanizePercentage }} available on {{ $labels.mountpoint }}"
+
+      # Disk space critical
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: betting-platform
+        annotations:
+          summary: "Critical disk space"
+          description: "Disk space is {{ $value | humanizePercentage }} available on {{ $labels.mountpoint }}"
+
+  - name: betting-platform-business.rules
+    rules:
+      # Revenue drop alert
+      - alert: RevenueDrop
+        expr: rate(betting_revenue_total[5m]) < 100
+        for: 10m
+        labels:
+          severity: warning
+          service: betting-platform-business
+        annotations:
+          summary: "Revenue drop detected"
+          description: "Revenue rate is {{ $value }} KES per minute, which is unusually low"
+
+      # High payout ratio
+      - alert: HighPayoutRatio
+        expr: rate(betting_payout_total[5m]) / rate(betting_volume_total[5m]) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: betting-platform-business
+        annotations:
+          summary: "High payout ratio"
+          description: "Payout ratio is {{ $value | humanizePercentage }}, which may indicate odds issues"
+
+      # Unusual betting patterns
+      - alert: UnusualBettingPatterns
+        expr: rate(betting_bets_placed_total[5m]) > 1000
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform-business
+        annotations:
+          summary: "Unusual betting activity"
+          description: "Betting rate is {{ $value }} bets per minute, which is unusually high"
+
+      # Payment volume anomaly
+      - alert: PaymentVolumeAnomaly
+        expr: rate(payment_volume_total[5m]) > 100000
+        for: 2m
+        labels:
+          severity: warning
+          service: betting-platform-business
+        annotations:
+          summary: "Unusual payment volume"
+          description: "Payment volume is {{ $value }} KES per minute, which is unusually high"
+
+      # Low user engagement
+      - alert: LowUserEngagement
+        expr: sum(betting_users_active_1h) < 50
+        for: 15m
+        labels:
+          severity: warning
+          service: betting-platform-business
+        annotations:
+          summary: "Low user engagement"
+          description: "Only {{ $value }} users have been active in the last hour"
