@@ -118,7 +118,7 @@ func UserSpecificGenerator(userID string) (*SnowflakeGenerator, error) {
 	// Convert user ID to numeric worker ID (simple hash)
 	workerID := 0
 	for _, char := range userID {
-		workerID = (workerID*31 + int(char)) % (maxWorkerID + 1)
+		workerID = (workerID*31 + int(char)) % 10000 // Limit to 4 digits (0-9999)
 	}
 
 	return NewSnowflakeGenerator(workerID)
