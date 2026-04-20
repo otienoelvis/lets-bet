@@ -16,14 +16,14 @@ func TestSnowflakeGenerator(t *testing.T) {
 	// Test basic generation
 	id1 := gen.GenerateID()
 	id2 := gen.GenerateID()
-	
+
 	if id1 == id2 {
 		t.Error("Generated IDs should be different")
 	}
 
-	// Test ID format (should be 19 characters: 14 timestamp + 4 worker + 3 sequence)
-	if len(id1) != 19 {
-		t.Errorf("Expected ID length 19, got %d", len(id1))
+	// Test ID format (should be 21 characters: 14 timestamp + 4 worker + 3 sequence)
+	if len(id1) != 21 {
+		t.Errorf("Expected ID length 21, got %d", len(id1))
 	}
 
 	// Test that IDs are chronologically sortable
@@ -65,7 +65,7 @@ func TestConcurrentGeneration(t *testing.T) {
 
 	var wg sync.WaitGroup
 	ids := make(chan string, 1000)
-	
+
 	// Generate IDs concurrently
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
@@ -97,7 +97,7 @@ func TestConcurrentGeneration(t *testing.T) {
 
 func TestServiceTypeGenerators(t *testing.T) {
 	testCases := []struct {
-		serviceType string
+		serviceType      string
 		expectedWorkerID string
 	}{
 		{"wallet", "5000"},
@@ -130,7 +130,7 @@ func TestServiceTypeGenerators(t *testing.T) {
 
 func TestCountrySpecificGenerators(t *testing.T) {
 	testCases := []struct {
-		countryCode string
+		countryCode      string
 		expectedWorkerID string
 	}{
 		{"KE", "1000"},
@@ -161,7 +161,7 @@ func TestCountrySpecificGenerators(t *testing.T) {
 
 func TestUserSpecificGenerators(t *testing.T) {
 	userIDs := []string{"user123", "user456", "user789"}
-	
+
 	generators := make([]*SnowflakeGenerator, len(userIDs))
 	for i, userID := range userIDs {
 		gen, err := UserSpecificGenerator(userID)
@@ -183,9 +183,9 @@ func TestUserSpecificGenerators(t *testing.T) {
 	}
 
 	// Different users should have different worker IDs
-	if workerIDs["user123"] == workerIDs["user456"] || 
-	   workerIDs["user456"] == workerIDs["user789"] || 
-	   workerIDs["user123"] == workerIDs["user789"] {
+	if workerIDs["user123"] == workerIDs["user456"] ||
+		workerIDs["user456"] == workerIDs["user789"] ||
+		workerIDs["user123"] == workerIDs["user789"] {
 		t.Error("Different users should have different worker IDs")
 	}
 }
@@ -199,7 +199,7 @@ func TestSequenceNumberHandling(t *testing.T) {
 	// Generate many IDs quickly to test sequence number handling
 	var lastTimestamp string
 	var lastSequence string
-	
+
 	for i := 0; i < 50; i++ {
 		id := gen.GenerateID()
 		timestamp, _, sequence, err := ParseSnowflakeID(id)
