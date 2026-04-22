@@ -90,7 +90,9 @@ func (s *SmokeTestSuite) SetupSuite() {
 
 	// Initialize services (in-memory for testing)
 	s.walletService = wallet.New(nil) // nil DB for testing
-	s.taxEngine = tax.Default()
+	taxEngine, err := tax.New()
+	s.Require().NoError(err)
+	s.taxEngine = taxEngine
 
 	// Setup test data
 	s.setupTestData()
@@ -220,7 +222,8 @@ func (s *SmokeTestSuite) TestWalletServiceSmoke() {
 	// Test tax calculation
 	grossPayout := decimal.NewFromFloat(200.00)
 	stake := decimal.NewFromFloat(100.00)
-	payoutBreakdown := s.taxEngine.ApplyPayoutTax("KE", grossPayout, stake)
+	payoutBreakdown, err := s.taxEngine.ApplyPayoutTax("KE", grossPayout, stake)
+	s.Require().NoError(err)
 
 	assert.NotNil(s.T(), payoutBreakdown, "Tax breakdown should be calculated")
 	assert.True(s.T(), payoutBreakdown.NetPayout.LessThan(grossPayout), "Net payout should be less than gross")
@@ -334,7 +337,8 @@ func (s *SmokeTestSuite) testBettingFlow() {
 	assert.True(s.T(), grossPayout.GreaterThan(betAmount), "Payout should be greater than bet")
 
 	// Test tax application
-	payoutBreakdown := s.taxEngine.ApplyPayoutTax("KE", grossPayout, betAmount)
+	payoutBreakdown, err := s.taxEngine.ApplyPayoutTax("KE", grossPayout, betAmount)
+	s.Require().NoError(err)
 	assert.True(s.T(), payoutBreakdown.NetPayout.LessThan(grossPayout), "Net payout should be less than gross after tax")
 
 	s.T().Log("Betting flow smoke test passed")

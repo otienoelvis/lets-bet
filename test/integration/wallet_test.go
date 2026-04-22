@@ -310,12 +310,15 @@ func TestWalletService(t *testing.T) {
 // TestWalletIntegrationWithTax tests wallet integration with tax engine
 func (s *WalletIntegrationTestSuite) TestWalletIntegrationWithTax() {
 	// Arrange
-	taxEngine := tax.Default()
+	taxEngine, err := tax.Default()
+	s.Require().NoError(err)
+
 	grossPayout := decimal.NewFromFloat(200.00)
 	stake := decimal.NewFromFloat(100.00)
 
 	// Act - Apply tax
-	payoutBreakdown := taxEngine.ApplyPayoutTax("KE", grossPayout, stake)
+	payoutBreakdown, err := taxEngine.ApplyPayoutTax("KE", grossPayout, stake)
+	s.Require().NoError(err)
 
 	// Assert
 	s.NotNil(payoutBreakdown, "Payout breakdown should not be nil")
